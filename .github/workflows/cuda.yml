@@ -11,7 +11,7 @@ on:
 
 # 工作流中的任务
 jobs:
-  build-with-specific-image:
+  build-with-NvidiaCuda-image:
     # 关键：使用 GitHub 提供的标准 Ubuntu 运行器，它自带 Docker
     runs-on: ubuntu-latest
 
@@ -22,10 +22,10 @@ jobs:
 
       # 第二步：使用指定的 Docker 镜像进行 CPU 编译
       # 注意：我们移除了 --gpus all 标志，因为运行器没有 GPU
-      - name: Build llama.cpp for CPU using Docker
+      - name: Build llama.cpp for T4GPU using Docker
         run: |
           docker run --rm -v ${{ github.workspace }}:/app -w /app nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04 \
-          bash -c "apt-get update && apt-get install -y cmake build-essential libcurl4-openssl-dev git && cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75 -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF && cmake --build build --config Release"
+          bash -c "apt-get update && apt-get install -y cmake build-essential libcurl4-openssl-dev git && cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75 -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_TOOLS=OFF && cmake --build build --config Release"
 
 
       # 第三步：上传编译产物
