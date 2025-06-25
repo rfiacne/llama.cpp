@@ -25,12 +25,8 @@ jobs:
       - name: Build llama.cpp for CPU using Docker
         run: |
           docker run --rm -v ${{ github.workspace }}:/app -w /app nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04 \
-          bash -c "apt-get update && apt-get install -y cmake build-essential && \
-          echo '--- Starting CPU-only build ---' && \
-          cmake -B build -DGGML_CUDA=ON && \
-          cmake --build build --config Release"
-        # 如果官方镜像拉取失败或过慢，你可以替换为自己的代理镜像：
-        # docker.1ms.run/nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04
+          bash -c "apt-get update && apt-get install -y cmake build-essential curl && cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75 && cmake --build build --config Release"
+
 
       # 第三步：上传编译产物
       - name: Upload build artifacts
