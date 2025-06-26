@@ -24,9 +24,11 @@ jobs:
       # 注意：我们移除了 --gpus all 标志，因为运行器没有 GPU
       - name: Build llama.cpp for T4GPU using Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04 \
-          bash -c "apt-get update && apt-get install -y cmake build-essential libcurl4-openssl-dev git && cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75 -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DCMAKE_EXE_LINKER_FLAGS="-L/usr/local/cuda/lib64/stubs" && cmake --build build --config Release"
-
+          docker run --rm -v /home/runner/work/llama.cpp/llama.cpp:/app -w /app nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04 \
+            bash -c "apt-get update && apt-get install -y cmake build-essential libcurl4-openssl-dev git && \
+            ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/libcuda.so.1 && \
+            cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75 -DLLAMA_BUILD_TOOLS=ON && \
+            cmake --build build --config Release"
 
       # 第三步：上传编译产物
       - name: Upload build artifacts
